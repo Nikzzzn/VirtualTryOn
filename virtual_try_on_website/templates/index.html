@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="POST" enctype="multipart/form-data" id="inputform">
+    {% csrf_token %}
+    <div class="container">
+        <div class="row">
+            <div class="col form-group files">
+                <label>Upload Your Photo</label>
+                <input type="file" class="form-control" name="image_person" id="image_person" accept="image/*" oninput="readURL(this)" ondragover="dragEnter(this)" ondragleave="dragLeave(this)">
+                <div class="file-upload-content">
+                    <img class="file-upload-image" src="#" alt="your photo" />
+                    <div class="image-title-wrap">
+                        <button type="button" onclick="removeUpload('image_person')" class="remove-image">Remove Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col form-group files">
+                <label>Upload Cloth Photo</label>
+                <input type="file" class="form-control" name="image_cloth" id="image_cloth" accept="image/*" oninput="readURL(this)" ondragover="dragEnter(this)" ondragleave="dragLeave(this)">
+                <div class="file-upload-content">
+                    <img class="file-upload-image" src="#" alt="cloth photo" />
+                    <div class="image-title-wrap">
+                        <button type="button" onclick="removeUpload('image_cloth')" class="remove-image">Remove Image</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+{#        <div class="file-upload">#}
+{#            <div class="image-upload-wrap">#}
+{#                <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />#}
+{#                <div class="drag-text">#}
+{#                  <h3>Drag and drop a file or select add Image</h3>#}
+{#                </div>#}
+{#            </div>#}
+{#            <div class="file-upload-content">#}
+{#                <img class="file-upload-image" src="#" alt="your image" />#}
+{#                <div class="image-title-wrap">#}
+{#                    <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+
+        <label for="method_selector">Select list:</label>
+        <select class="form-control" id="method_selector" name="method">
+            <option>ViTON</option>
+            <option>CP-VTON+</option>
+            <option>HR-VTON</option>
+        </select>
+        <button type="submit" id="btnUpload" class="btn btn-primary">Upload</button>
+    </div>
+</form>
+<div id="spinner-div" class="pt-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p id="spinner-text">Loading...</p>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+function readURL(input) {
+    input_node = $(`#${input.id}`);
+    file_upload_content_node = input_node.next();
+    file_upload_image_node = file_upload_content_node.children('img');
+    files_node = input_node.parent()
+    input_node.removeClass('image-dropping');
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            input_node.hide();
+            file_upload_image_node.attr('src', e.target.result);
+            file_upload_content_node.show();
+            files_node.addClass('no-pseudo');
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        removeUpload(input.id);
+    }
+}
+
+function removeUpload(input_id) {
+    input_node = $(`#${input_id}`);
+    file_upload_content_node = input_node.next();
+    file_upload_image_node = file_upload_content_node.children('img');
+    files_node = input_node.parent()
+    {#$('.file-upload-input').replaceWith($('.file-upload-input').clone());#}
+    file_upload_content_node.hide();
+    input_node[0].value = null;
+    input_node.show();
+    console.log(input_node);
+    files_node.removeClass('no-pseudo');
+}
+function dragEnter(element) {
+    $(`#${element.id}`).addClass('image-dropping');
+}
+function dragLeave(element) {
+    $(`#${element.id}`).removeClass('image-dropping');
+}
+</script>
+<script>
+$("#inputform").on('submit', function(e){
+    e.preventDefault();
+    formdata = new FormData(this);
+    $("#spinner-div").show();
+    $("#spinner-text").html("Calculating pose keypoints...");
+    $.ajax({
+        url         : '{% url "post_images" %}',
+        type        : 'POST',
+        data        : formdata,
+        cache       : false,
+        contentType : false,
+        processData : false,
+        success : function(data) {
+            console.log('success');
+            console.log(data.result);
+            var pose_keypoints = data["result"];
+            formdata.append("pose_keypoints", pose_keypoints)
+            {#$("#inputform").trigger('reset');#}
+            $("#spinner-text").html("Generating image...");
+            $.ajax({
+                url         : '{% url "post_pose" %}',
+                type        : 'POST',
+                data        : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                success : function(data) {
+                    console.log('success');
+                    console.log(data.result);
+                },
+                complete: function () {
+                    $("#spinner-div").hide();
+                },
+                error: function(data) {
+                    console.log('viton-fail');
+                }
+            });
+        },
+        error: function(data) {
+            console.log('image-fail');
+            $("#spinner-div").hide();
+        }
+    });
+});
+</script>
+{% endblock javascript %}
