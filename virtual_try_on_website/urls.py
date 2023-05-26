@@ -23,6 +23,8 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('post/ajax/images', views.postImages, name="post_images"),
-    path('post/ajax/pose', views.postPose, name="post_pose"),
+    path('post/ajax/calculate_pose', views.post_calculate_person_pose, name="calculate_pose"),
+    path('post/ajax/calculate_segmentation', views.post_calculate_segmentation, name="calculate_segmentation"),
+    path('post/ajax/calculate_mask', views.post_calculate_cloth_mask, name="calculate_mask"),
+    path('post/ajax/generate_result', views.post_generate_result, name="generate_result"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
