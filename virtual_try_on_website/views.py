@@ -1,17 +1,17 @@
-import base64
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
 from .forms import ImageUploadForm
 from .Utils import *
-from .PoseParser import pose_parse
 from virtual_try_on_website.processors.lip_jppnet import LIP_JPPNet
 from virtual_try_on_website.processors.u2netp import U2NETP_Processor
+from .processors.openpose import OpenPose_Processor
 from .processors.viton import ViTON_Processor
 
 lip_jppnet_model = LIP_JPPNet()
 u2netp_model = U2NETP_Processor()
 viton_model = ViTON_Processor()
+openpose_model = OpenPose_Processor()
 
 
 def index(request):
@@ -33,7 +33,7 @@ def post_calculate_person_pose(request):
             # person_image_uri = 'data:%s;base64,%s' % ('image/jpeg', encoded_img)
             # person_image_bytes = read_base64(person_image_uri)
             person_image = read_uploaded_image(form.cleaned_data['image_person'])
-            keypoints_dict = pose_parse(person_image)
+            keypoints_dict = openpose_model.pose_parse(person_image)
 
             return JsonResponse({"result": keypoints_dict}, status=200)
         else:
@@ -88,7 +88,6 @@ def post_generate_result(request):
             cloth_image = read_uploaded_image(form.cleaned_data['image_cloth'])
 
             pose_keypoints = json.loads(form.cleaned_data["pose_keypoints"])
-            pose_keypoints = pose_keypoints['people'][0]['pose_keypoints']
 
             person_segmentation = read_base64(form.cleaned_data["person_segmentation"], mode='pil')
             cloth_mask = read_base64(form.cleaned_data["cloth_mask"], grayscale=True)

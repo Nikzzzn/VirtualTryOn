@@ -79,17 +79,18 @@ class LIP_JPPNet:
 
     @classmethod
     def __transform_image(cls, person_image):
-        input_size = [512, 512]
-        aspect_ratio = input_size[1] * 1.0 / input_size[0]
+        h, w, _ = person_image.shape
+        aspect_ratio = h / w
         person_center = np.zeros(2, dtype=np.float32)
 
-        h, w, _ = person_image.shape
         person_center[0] = w * 0.5
         person_center[1] = h * 0.5
-        # if w > aspect_ratio * h:
-        #     h = w * 1.0 / aspect_ratio
-        # elif w < aspect_ratio * h:
-        #     w = h * aspect_ratio
+        if w > h:
+            w = cls.input_size[1]
+            h = int(aspect_ratio * w)
+        else:
+            h = cls.input_size[0]
+            w = int(h / aspect_ratio)
 
         normalization_transform = transforms.Compose([
             transforms.ToTensor(),
@@ -97,23 +98,31 @@ class LIP_JPPNet:
         ])
 
         identity_transform = np.array([[1., -0., 0.], [0., 1., 0.]])
+        image = cv2.resize(person_image, (w, h))
         image = cv2.warpAffine(
-            person_image,
+            image,
             identity_transform,
-            (input_size[1], input_size[0]),
+            (cls.input_size[1], cls.input_size[0]),
             flags=cv2.INTER_LINEAR,
             borderMode=cv2.BORDER_CONSTANT,
             borderValue=(0, 0, 0)
         )
         image = normalization_transform(image)
 
-        return image
+        metadata = {
+            "resized_w": w,
+            "resized_h": h,
+        }
+
+        return image, metadata
 
     @torch.no_grad()
     def parse_person(self, person_image):
-        image = self.__transform_image(person_image)
-        h = person_image.shape[0]
-        w = person_image.shape[1]
+        image, metadata = self.__transform_image(person_image)
+        input_h = person_image.shape[0]
+        input_w = person_image.shape[1]
+        resized_h = metadata["resized_h"]
+        resized_w = metadata["resized_w"]
         palette = self.__get_masking_palette(self.num_classes)
 
         output = self.model(image[None, :])
@@ -129,7 +138,7 @@ class LIP_JPPNet:
             target_logit = cv2.warpAffine(
                 upsample_output[:, :, i],
                 identity_transform,
-                (w, h),
+                (resized_w, resized_h),
                 flags=cv2.INTER_LINEAR,
                 borderMode=cv2.BORDER_CONSTANT,
                 borderValue=0)
@@ -140,6 +149,7 @@ class LIP_JPPNet:
 
         output_img = Image.fromarray(np.asarray(parsing_result, dtype=np.uint8))
         output_img.putpalette(palette)
+        output_img = output_img.resize((input_w, input_h))
 
         buffered = BytesIO()
         output_img.convert('P').save(buffered, format="PNG")
