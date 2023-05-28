@@ -6,7 +6,7 @@ import torch
 import argparse
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageDraw
 from collections import OrderedDict
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -23,8 +23,8 @@ class LIP_JPPNet:
     def __init__(self):
         self.model = self.__load_model()
 
-    @classmethod
-    def __get_masking_palette(cls, num_cls):
+    @staticmethod
+    def __get_masking_palette(num_cls):
         palette = [0] * (num_cls * 3)
         for j in range(0, num_cls):
             temp = j
@@ -40,8 +40,8 @@ class LIP_JPPNet:
                 temp >>= 3
         return palette
 
-    @classmethod
-    def get_mask_arrays(cls, person_segmentation):
+    @staticmethod
+    def get_mask_arrays(person_segmentation):
         shape = (person_segmentation > 0).astype(np.float32)
         head = (person_segmentation == 1).astype(np.float32) + \
                (person_segmentation == 2).astype(np.float32) + \
@@ -59,6 +59,36 @@ class LIP_JPPNet:
                (person_segmentation > 7).astype(np.float32)
         body = (body > 0).astype(np.float32)
         return shape, head, cloth, body
+
+    def get_parse_agnostic(self, person_segmentation, pose_data, w=768, h=1024):
+        parse_array = np.array(person_segmentation)
+        parse_upper = ((parse_array == 5).astype(np.float32) +
+                       (parse_array == 6).astype(np.float32) +
+                       (parse_array == 7).astype(np.float32))
+        parse_neck = (parse_array == 10).astype(np.float32)
+
+        r = 10
+        agnostic = person_segmentation.copy()
+
+        for parse_id, pose_ids in [(14, [2, 5, 6, 7]), (15, [5, 2, 3, 4])]:
+            mask_arm = Image.new('L', (w, h), 'black')
+            mask_arm_draw = ImageDraw.Draw(mask_arm)
+            i_prev = pose_ids[0]
+            for i in pose_ids[1:]:
+                if (pose_data[i_prev, 0] == 0.0 and pose_data[i_prev, 1] == 0.0) or (pose_data[i, 0] == 0.0 and pose_data[i, 1] == 0.0):
+                    continue
+                mask_arm_draw.line([tuple(pose_data[j]) for j in [i_prev, i]], 'white', width=r * 10)
+                pointx, pointy = pose_data[i]
+                radius = r * 4 if i == pose_ids[-1] else r * 15
+                mask_arm_draw.ellipse((pointx - radius, pointy - radius, pointx + radius, pointy + radius), 'white', 'white')
+                i_prev = i
+            parse_arm = (np.array(mask_arm) / 255) * (parse_array == parse_id).astype(np.float32)
+            agnostic.paste(0, None, Image.fromarray(np.uint8(parse_arm * 255), 'L'))
+
+        agnostic.paste(0, None, Image.fromarray(np.uint8(parse_upper * 255), 'L'))
+        agnostic.paste(0, None, Image.fromarray(np.uint8(parse_neck * 255), 'L'))
+
+        return agnostic
 
     @classmethod
     def __load_model(cls):
