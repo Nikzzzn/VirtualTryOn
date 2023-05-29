@@ -28,9 +28,29 @@
     z-index: 2;
 }
 
+#result-image {
+    display: none;
+    max-height: 400px;
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+}
+
+.result {
+    justify-content: center;
+}
+
+.selector {
+    flex-wrap: nowrap;
+}
+
 .files input.image-dropping {
     background-color: #DCDCDC;
     outline-style: solid;
+}
+
+#btnUpload {
+    margin-left: 5px;
 }
 
 .files input {

@@ -2,7 +2,7 @@ from django import forms
 
 
 class ImageUploadForm(forms.Form):
-    CHOICES = (('ViTON', 'ViTON'), ('CP-VTON+', 'CP-VTON+'), ('HR-VTON', 'HR-VTON'))
+    CHOICES = (('CP-VTON+', 'CP-VTON+'), ('VITON-HD', 'VITON-HD'), ('HR-VITON', 'HR-VITON'))
 
     image_person = forms.ImageField(label="Person")
     image_cloth = forms.ImageField(label="Cloth")

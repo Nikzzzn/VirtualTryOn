@@ -2,7 +2,7 @@
 from detectron2.data import MetadataCatalog
 from detectron2.utils.file_io import PathManager
 
-from densepose import DensePoseTransformData
+from .. import DensePoseTransformData
 
 
 def load_for_dataset(dataset_name):

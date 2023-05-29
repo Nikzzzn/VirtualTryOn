@@ -60,7 +60,8 @@ class LIP_JPPNet:
         body = (body > 0).astype(np.float32)
         return shape, head, cloth, body
 
-    def get_parse_agnostic(self, person_segmentation, pose_data, w=768, h=1024):
+    @staticmethod
+    def get_parse_agnostic(person_segmentation, pose_data, w=768, h=1024):
         parse_array = np.array(person_segmentation)
         parse_upper = ((parse_array == 5).astype(np.float32) +
                        (parse_array == 6).astype(np.float32) +
@@ -100,7 +101,7 @@ class LIP_JPPNet:
         model.std = [0.225, 0.224, 0.229]
 
         model = nn.DataParallel(model)
-        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "./lip_jppnet.pth")
+        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "models/lip_jppnet.pth")
         state_dict = torch.load(state_dict_path)
         model.load_state_dict(state_dict)
         model.eval()

@@ -22,8 +22,8 @@ from detectron2.data.catalog import DatasetCatalog, Metadata, MetadataCatalog
 from detectron2.data.samplers import TrainingSampler
 from detectron2.utils.comm import get_world_size
 
-from densepose.config import get_bootstrap_dataset_config
-from densepose.modeling import build_densepose_embedder
+from ..config import get_bootstrap_dataset_config
+from ..modeling import build_densepose_embedder
 
 from .combined_loader import CombinedDataLoader, Loader
 from .dataset_mapper import DatasetMapper

@@ -20,8 +20,8 @@ from detectron2.solver.build import get_default_optimizer_params, maybe_add_grad
 from detectron2.utils import comm
 from detectron2.utils.events import EventWriter, get_event_storage
 
-from densepose import DensePoseDatasetMapperTTA, DensePoseGeneralizedRCNNWithTTA, load_from_cfg
-from densepose.data import (
+from .. import DensePoseDatasetMapperTTA, DensePoseGeneralizedRCNNWithTTA, load_from_cfg
+from ..data import (
     DatasetMapper,
     build_combined_loader,
     build_detection_test_loader,
@@ -29,9 +29,9 @@ from densepose.data import (
     build_inference_based_loaders,
     has_inference_based_loaders,
 )
-from densepose.evaluation.d2_evaluator_adapter import Detectron2COCOEvaluatorAdapter
-from densepose.evaluation.evaluator import DensePoseCOCOEvaluator, build_densepose_evaluator_storage
-from densepose.modeling.cse import Embedder
+from ..evaluation.d2_evaluator_adapter import Detectron2COCOEvaluatorAdapter
+from ..evaluation.evaluator import DensePoseCOCOEvaluator, build_densepose_evaluator_storage
+from ..modeling.cse import Embedder
 
 
 class SampleCountingLoader:

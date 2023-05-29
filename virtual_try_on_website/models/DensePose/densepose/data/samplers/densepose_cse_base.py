@@ -7,10 +7,10 @@ from torch.nn import functional as F
 from detectron2.config import CfgNode
 from detectron2.structures import Instances
 
-from densepose.converters.base import IntTupleBox
-from densepose.data.utils import get_class_to_mesh_name_mapping
-from densepose.modeling.cse.utils import squared_euclidean_distance_matrix
-from densepose.structures import DensePoseDataRelative
+from ...converters.base import IntTupleBox
+from ...data.utils import get_class_to_mesh_name_mapping
+from ...modeling.cse.utils import squared_euclidean_distance_matrix
+from ...structures import DensePoseDataRelative
 
 from .densepose_base import DensePoseBaseSampler
 

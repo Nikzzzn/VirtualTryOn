@@ -195,7 +195,7 @@ class TpsGridGen(nn.Module):
         return torch.cat((points_X_prime, points_Y_prime), 3)
 
 
-class ViTON_GMM(nn.Module):
+class CP_VTON_GMM(nn.Module):
     def __init__(self, width=192, height=256, grid_size=5):
         super().__init__()
         self.extractionA = FeatureExtraction(22, ngf=64, n_layers=3, norm_layer=nn.BatchNorm2d)
@@ -265,7 +265,7 @@ class UnetSkipConnectionBlock(nn.Module):
             return torch.cat([x, self.model(x)], 1)
 
 
-class ViTON_TOM(nn.Module):
+class CP_VTON_TOM(nn.Module):
     def __init__(self, input_nc, output_nc, num_downs, ngf=64, norm_layer=nn.BatchNorm2d):
         super().__init__()
         unet_block = UnetSkipConnectionBlock(ngf * 8, ngf * 8, input_nc=None, submodule=None, norm_layer=norm_layer, innermost=True)

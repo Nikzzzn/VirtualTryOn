@@ -7,7 +7,7 @@ import torch
 
 from detectron2.utils.file_io import PathManager
 
-from densepose.data.meshes.catalog import MeshCatalog, MeshInfo
+from ..data.meshes.catalog import MeshCatalog, MeshInfo
 
 
 def _maybe_copy_to_device(

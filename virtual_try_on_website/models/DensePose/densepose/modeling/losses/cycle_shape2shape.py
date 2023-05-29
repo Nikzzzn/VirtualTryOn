@@ -8,7 +8,7 @@ from torch.nn import functional as F
 
 from detectron2.config import CfgNode
 
-from densepose.structures.mesh import create_mesh
+from ...structures.mesh import create_mesh
 
 from .utils import sample_random_indices
 

@@ -25,14 +25,14 @@ from scipy.ndimage import zoom as spzoom
 
 from detectron2.utils.file_io import PathManager
 
-from densepose.converters.chart_output_to_chart_result import resample_uv_tensors_to_bbox
-from densepose.converters.segm_to_mask import (
+from ..converters.chart_output_to_chart_result import resample_uv_tensors_to_bbox
+from ..converters.segm_to_mask import (
     resample_coarse_segm_tensor_to_bbox,
     resample_fine_and_coarse_segm_tensors_to_bbox,
 )
-from densepose.modeling.cse.utils import squared_euclidean_distance_matrix
-from densepose.structures import DensePoseDataRelative
-from densepose.structures.mesh import create_mesh
+from ..modeling.cse.utils import squared_euclidean_distance_matrix
+from ..structures import DensePoseDataRelative
+from ..structures.mesh import create_mesh
 
 logger = logging.getLogger(__name__)
 

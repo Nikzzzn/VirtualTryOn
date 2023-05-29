@@ -3,7 +3,7 @@
 from detectron2.data.catalog import Metadata
 from detectron2.evaluation import COCOEvaluator
 
-from densepose.data.datasets.coco import (
+from ..data.datasets.coco import (
     get_contiguous_id_to_category_id_map,
     maybe_filter_categories_cocoapi,
 )

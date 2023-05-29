@@ -8,11 +8,11 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 from PIL import Image, ImageDraw
 from virtual_try_on_website import settings
-from virtual_try_on_website.models.viton import ViTON_GMM, ViTON_TOM
+from virtual_try_on_website.models.cp_viton import CP_VTON_GMM, CP_VTON_TOM
 from virtual_try_on_website.processors.lip_jppnet import LIP_JPPNet
 
 
-class ViTON_Processor:
+class CP_VTON_Processor:
     def __init__(self):
         self.gmm_model = self.__load_gmm_model()
         self.tom_model = self.__load_tom_model()
@@ -22,20 +22,20 @@ class ViTON_Processor:
         ])
         self.radius = 5
 
-    @classmethod
-    def __load_gmm_model(cls):
-        model = ViTON_GMM()
-        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "./viton/gmm_final.pth")
+    @staticmethod
+    def __load_gmm_model():
+        model = CP_VTON_GMM()
+        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "models/cp_vton/gmm_final.pth")
         state_dict = torch.load(state_dict_path)
         model.load_state_dict(state_dict)
         model.eval()
 
         return model
 
-    @classmethod
-    def __load_tom_model(cls):
-        model = ViTON_TOM(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
-        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "./viton/tom_final.pth")
+    @staticmethod
+    def __load_tom_model():
+        model = CP_VTON_TOM(25, 4, 6, ngf=64, norm_layer=nn.InstanceNorm2d)
+        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "models/cp_vton/tom_final.pth")
         state_dict = torch.load(state_dict_path)
         model.load_state_dict(state_dict)
         model.eval()

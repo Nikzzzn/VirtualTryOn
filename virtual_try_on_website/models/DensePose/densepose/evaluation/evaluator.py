@@ -23,9 +23,9 @@ from detectron2.utils.comm import gather, get_rank, is_main_process, synchronize
 from detectron2.utils.file_io import PathManager
 from detectron2.utils.logger import create_small_table
 
-from densepose.converters import ToChartResultConverter, ToMaskConverter
-from densepose.data.datasets.coco import maybe_filter_and_map_categories_cocoapi
-from densepose.structures import (
+from ..converters import ToChartResultConverter, ToMaskConverter
+from ..data.datasets.coco import maybe_filter_and_map_categories_cocoapi
+from ..structures import (
     DensePoseChartPredictorOutput,
     DensePoseEmbeddingPredictorOutput,
     quantize_densepose_chart_result,

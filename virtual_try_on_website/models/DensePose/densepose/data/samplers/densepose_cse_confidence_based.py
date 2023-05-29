@@ -8,7 +8,7 @@ from torch.nn import functional as F
 from detectron2.config import CfgNode
 from detectron2.structures import Instances
 
-from densepose.converters.base import IntTupleBox
+from ...converters.base import IntTupleBox
 
 from .densepose_cse_base import DensePoseCSEBaseSampler
 

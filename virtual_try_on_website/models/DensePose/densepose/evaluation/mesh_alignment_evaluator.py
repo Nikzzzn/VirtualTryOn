@@ -8,7 +8,7 @@ from torch import nn
 
 from detectron2.utils.file_io import PathManager
 
-from densepose.structures.mesh import create_mesh
+from ..structures.mesh import create_mesh
 
 
 class MeshAlignmentEvaluator:

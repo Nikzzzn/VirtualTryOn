@@ -31,7 +31,7 @@ class U2NETP_Processor:
     @classmethod
     def __load_model(cls):
         model = U2NETP(3, 1)
-        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "./u2netp.pth")
+        state_dict_path = os.path.join(settings.STATICFILES_DIRS[0], "models/u2netp.pth")
         state_dict = torch.load(state_dict_path, map_location='cpu')
         model.load_state_dict(state_dict)
         model.eval()

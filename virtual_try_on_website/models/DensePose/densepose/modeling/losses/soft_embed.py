@@ -8,9 +8,9 @@ from torch.nn import functional as F
 from detectron2.config import CfgNode
 from detectron2.structures import Instances
 
-from densepose.data.meshes.catalog import MeshCatalog
-from densepose.modeling.cse.utils import normalize_embeddings, squared_euclidean_distance_matrix
-from densepose.structures.mesh import create_mesh
+from ...data.meshes.catalog import MeshCatalog
+from ...modeling.cse.utils import normalize_embeddings, squared_euclidean_distance_matrix
+from ...structures.mesh import create_mesh
 
 from .embed_utils import PackedCseAnnotations
 from .utils import BilinearInterpolationHelper

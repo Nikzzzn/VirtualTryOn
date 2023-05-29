@@ -1,7 +1,9 @@
+import io
 import os
 import cv2
 import numpy as np
 import torch
+from PIL import Image
 from detectron2.config import get_cfg
 from detectron2.engine.defaults import DefaultPredictor
 from virtual_try_on_website import settings
@@ -20,6 +22,7 @@ class DensePose_Processor:
 
     @torch.no_grad()
     def generate_densepose(self, person_image):
+        person_image = np.array(person_image)
         outputs = self.predictor(person_image)["instances"]
 
         if isinstance(outputs.pred_densepose, DensePoseChartPredictorOutput):
@@ -41,9 +44,13 @@ class DensePose_Processor:
         mask = np.zeros(matrix.shape, dtype=np.uint8)
         mask[segm > 0] = 1
 
-        mask_visualizer = MatrixVisualizer(inplace=False, cmap=cv2.COLORMAP_PARULA, val_scale=DensePoseDataRelative.N_PART_LABELS, alpha=1.0)
+        mask_visualizer = MatrixVisualizer(inplace=False, cmap=cv2.COLORMAP_PARULA, val_scale=255./DensePoseDataRelative.N_PART_LABELS, alpha=1.0)
 
         res_img = mask_visualizer.visualize(person_image, mask, matrix, bbox_xywh)
+
+        _, buffer = cv2.imencode(".png", res_img)
+        io_buf = io.BytesIO(buffer)
+        res_img = Image.open(io_buf)
 
         return res_img
 
@@ -51,8 +58,8 @@ class DensePose_Processor:
     def setup_config():
         cfg = get_cfg()
         add_densepose_config(cfg)
-        model_path = os.path.join(settings.STATICFILES_DIRS[0], "densepose", "model_final_162be9.pkl")
-        cfg.merge_from_file("../models/DensePose/configs/densepose_rcnn_R_50_FPN_s1x.yaml")
+        model_path = os.path.join(settings.STATICFILES_DIRS[0], "models", "densepose", "model_final_162be9.pkl")
+        cfg.merge_from_file(os.path.join(settings.STATICFILES_DIRS[0], "models", "densepose", "densepose_rcnn_R_50_FPN_s1x.yaml"))
         cfg.MODEL.DEVICE = "cpu"
         cfg.MODEL.WEIGHTS = model_path
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
