@@ -136,7 +136,6 @@ class VITON_HD_Processor:
 
         person_segmentation = transforms.Resize(self.fine_width, interpolation=0)(person_segmentation)
         parse_agnostic = LIP_JPPNet.get_parse_agnostic(person_segmentation, pose_data_reshaped)
-        parse_agnostic.show()
         parse_agnostic = torch.from_numpy(np.array(parse_agnostic)[None]).long()
 
         labels = {
@@ -166,12 +165,10 @@ class VITON_HD_Processor:
         person_image_tensor = normalization_transform(person_image)
 
         agnostic = self.get_agnostic(person_image, person_segmentation, pose_data_reshaped)
-        agnostic.show()
         agnostic = transforms.Resize(self.fine_width, interpolation=0)(agnostic)
         agnostic = normalization_transform(agnostic)
 
         pose_skeleton = OpenPose_Processor.render_pose_skeleton(person_image, pose_data)
-        pose_skeleton.show()
         pose_skeleton = normalization_transform(pose_skeleton)
 
         result = {

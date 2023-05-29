@@ -76,9 +76,10 @@ class U2NETP_Processor:
         prediction = prediction.squeeze()
         prediction_np = prediction.cpu().data.numpy()
         prediction_np = np.where(prediction_np >= 0.5, 1, 0)
+        prediction_np = (prediction_np * 255).astype(np.uint8)
 
-        cloth_mask = Image.fromarray(prediction_np * 255).convert('RGB')
-        cloth_mask = cloth_mask.resize((input_shape[1], input_shape[0]), resample=Image.BILINEAR)
+        cloth_mask = Image.fromarray(prediction_np).convert('RGB')
+        cloth_mask = cloth_mask.resize((input_shape[1], input_shape[0]), resample=Image.NEAREST)
 
         buffered = BytesIO()
         cloth_mask.save(buffered, format="JPEG")
