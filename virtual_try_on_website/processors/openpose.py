@@ -63,10 +63,11 @@ class OpenPose_Processor:
         static_dir = settings.STATICFILES_DIRS[0]
         model_body25_proto = os.path.join(static_dir, "models", "openpose", "pose_deploy.prototxt")
         model_body25_weight = os.path.join(static_dir, "models", "openpose", "pose_iter_584000.caffemodel")
-        # model_body25_proto = os.path.join(static_dir, "models", "openpose", "pose_deploy_linevec.prototxt")
-        # model_body25_weight = os.path.join(static_dir, "models", "openpose", "pose_iter_440000.caffemodel")
+        model_coco_proto = os.path.join(static_dir, "models", "openpose", "pose_deploy_linevec.prototxt")
+        model_coco_weight = os.path.join(static_dir, "models", "openpose", "pose_iter_440000.caffemodel")
 
-        self.model = cv2.dnn.readNetFromCaffe(model_body25_proto, model_body25_weight)
+        self.body25_model = cv2.dnn.readNetFromCaffe(model_body25_proto, model_body25_weight)
+        self.coco_model = cv2.dnn.readNetFromCaffe(model_coco_proto, model_coco_weight)
 
     @staticmethod
     def __get_rectangle(keypoints, threshold):
@@ -90,12 +91,17 @@ class OpenPose_Processor:
         return [minX, minY, maxX-minX, maxY-minY]
 
     def pose_parse(self, person_image, n_points=25, width=192, height=256):
+        if n_points == 18:
+            model = self.coco_model
+        elif n_points == 25:
+            model = self.body25_model
+            
         person_image = np.array(person_image)
         frameWidth = person_image.shape[1]
         frameHeight = person_image.shape[0]
         inpBlob = cv2.dnn.blobFromImage(person_image, 1.0 / 255, (width, height), (0, 0, 0), swapRB=False, crop=False)
-        self.model.setInput(inpBlob)
-        output = self.model.forward()
+        model.setInput(inpBlob)
+        output = model.forward()
         H = output.shape[2]
         W = output.shape[3]
         keypoints = []
@@ -107,9 +113,6 @@ class OpenPose_Processor:
             keypoints.append(x)
             keypoints.append(y)
             keypoints.append(prob)
-
-        if n_points == 18:
-            return keypoints[:54]
 
         return keypoints
 

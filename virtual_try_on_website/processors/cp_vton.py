@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 from PIL import Image, ImageDraw
 from virtual_try_on_website import settings
-from virtual_try_on_website.models.cp_viton import CP_VTON_GMM, CP_VTON_TOM
+from virtual_try_on_website.models.cp_vton import CP_VTON_GMM, CP_VTON_TOM
 from virtual_try_on_website.processors.lip_jppnet import LIP_JPPNet
 
 
