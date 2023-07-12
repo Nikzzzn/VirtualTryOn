@@ -70,7 +70,7 @@ class OpenPose_Processor:
         self.coco_model = cv2.dnn.readNetFromCaffe(model_coco_proto, model_coco_weight)
 
     @staticmethod
-    def __get_rectangle(keypoints, threshold):
+    def get_rectangle(keypoints, threshold):
         minX = np.iinfo(int).max
         maxX = np.iinfo(int).min
         minY = minX
@@ -154,7 +154,7 @@ class OpenPose_Processor:
         width = person_image.shape[1]
         area = width * height
 
-        person_rectangle = OpenPose_Processor.__get_rectangle(pose_keypoints, threshold=threshold)
+        person_rectangle = OpenPose_Processor.get_rectangle(pose_keypoints, threshold=threshold)
 
         ratio_areas = min(1, max(person_rectangle[2] / width, person_rectangle[3] / height))
         thickness_ratio = max(math.sqrt(area) * thickness_circle_ratio * ratio_areas, 2)
