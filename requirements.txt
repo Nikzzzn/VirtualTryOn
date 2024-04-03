@@ -1,4 +1,4 @@
-Django==4.2.1
+Django==4.2.11
 numpy==1.22.0
 opencv-python==4.7.0.72
 scikit-image==0.20.0
